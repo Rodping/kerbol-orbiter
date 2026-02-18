@@ -1,22 +1,35 @@
 import java.util.Scanner;
 import java.util.Random;
+import java.util.ArrayList;
 
 public class KerbolOrbiter {
     public static void main(String[] args) {
+        
+        KerbolSystemSet();
+        
+    }
+    static void KerbolSystemSet(){
+        Planet sun = new Planet();
+        
+        sun.name.set("Kerbol");
+        sun.physics.type.set("Sun");
+        sun.physics.equat_rad.set(261000000); //meters
+        
         //vytvorime planetu
         Planet kerbin = new Planet();
+        
         
         kerbin.name.set("Kerbin");
         kerbin.physics.type.set("Planet");
         
         kerbin.physics.equat_rad.set(600000); //meters
         
-        //long m = (long) Math.pow(10, 22); 
-        //kerbin.physics.mass.set((long)(5.2915158 * m));
-        //                          Value to Expo  Expo
-        kerbin.physics.mass.setShorter(5.2915158, 22);
+        //long m = (long) Math.pow(10, 22);
+        kerbin.physics.mass.setShorter(5.2915158d, 22);
         //kerbin.physics.mass.add(10);
-        
+        kerbin.orbit.ap_pe_apsis.set("both", 13599840256L, 13599840256L);
+        //kerbin.orbit.apoapsis.set(13599840256L);
+        //kerbin.orbit.periapsis.set(13599840256L);
         
         Planet mun = new Planet();
         
@@ -25,10 +38,10 @@ public class KerbolOrbiter {
         
         mun.physics.equat_rad.set(200000);
         
-        mun.physics.mass.setShorter(9.7599066, 20);
+        mun.physics.mass.setShorter(9.7599066d, 20);
         //mun.physics.mass.add(-3);
         
-        
+        mun.orbit.ap_pe_apsis.set("both", 12000000L, 12000000L);
     }
     
 }        
@@ -38,28 +51,72 @@ class Planet {
     
     String _emoji = "🌐";
     String _name;
+    short ID =-1; //-1 = does not exist
+    static Short nextFreeID = 0;
+    //static String[] Objects = new String[100];
+    //static public short[] IDs = new short[100];
     static String prev_selected;
+    static ArrayList<String> Objects = new ArrayList<>(); // Inicializace seznamu
+    static ArrayList<Short> IDs = new ArrayList<>();
     
-    String _type;
+    ///PHYSICAL CHARACTERISTICS
+    String _type; //type of object
+    
     
     int _equator_rad=0; //Equatorial radius
     
-    //NASTAVENI HMOTNOSTI -- WEIGHT SET
+    //-- NASTAVENI HMOTNOSTI -- WEIGHT SET
     long local_mass = 0;
     String short_local_mass;
-    private double ExpValue = 0; //Cislo ktere se bude exponovat
-    private int Exp = 0; //Exponent ktery bude exponovat
+    private double ExpValue = 0; //Shorter number to exponentiate
+    private int Exp = 0; //exponent
     
     
+    ///ORBITAL CHARACTERISTICS
+    long _semimajor_axis;
+    long _apoapsis;
+    long _periapsis;
+    
+    //--more information on the picture of orbit char.
+    short _orbital_ecc; //Orbital eccentricity
+    short _orbital_in; //Orbital inclination
+    short _argument_of_periapsis; //Argument of periapsis
+    short _longitude; //longitude of the ascending node
+    short _sidereal_orbital_per; //time to complete orbit around another object
+    short _orbital_vel; //Orbital velosity
+    
+    
+    //Class seter
     public Name name = new Name();
     
     public class Name{
         void set(String newName){
-            _name = newName;}
+            if(ID == -1){
+                ID = nextFreeID;
+                IDs.add((Short)(ID));
+                nextFreeID++;
+                
+                _name = newName;
+                Objects.add(_name);
+                
+            }
+            else{
+                _name = newName;
+                Objects.set(ID, _name);
+                Objects.add(_name);
+                
+            }
+            for(int i = 0; Objects.size() < i; i++){
+                if(Objects.get(i).equals(_name)){}
+            }
+            _name = newName;
+        }
+        
         String get(){
             return _name;}
+        int getID(){
+            return (int)ID;}
     }
-    
     
     
     
@@ -69,6 +126,7 @@ class Planet {
     public Orbit orbit = new Orbit();
     
     public class Physics{
+        /////////////////////////
         public Type type = new Type(); // type of object - sun, planet, gas giant
         public EquatRad equat_rad = new EquatRad();
         public Mass mass = new Mass();
@@ -146,7 +204,7 @@ class Planet {
         
         void print(String attr){
             if(!(_name == prev_selected)) 
-                System.out.println("\n"+_emoji+_name);
+                System.out.println("\n"+_emoji+_name+", ID: "+ID);
             prev_selected = _name;
             switch(attr){//F### - cely vypis
                 case "all":
@@ -166,9 +224,72 @@ class Planet {
         }
     }        
     public class Orbit{
+        /////////////////////////
+        public SemiMajor_Axis semimajor_axis = new SemiMajor_Axis();
+        public Apoapsis apoapsis = new Apoapsis();
+        public Periapsis periapsis = new Periapsis();
+        public Ap_Pe_Apsis ap_pe_apsis = new Ap_Pe_Apsis();
+        //public Orbital_Arguments orbital_args = new Orbital_Arguments();
+        /////////////////////////
         
+        class SemiMajor_Axis{
+            long get(){
+                return _semimajor_axis;
+            }
+        }
+        class Ap_Pe_Apsis{
+            void set(String ToSet, long Apo, long Peri){
+                if(ToSet == "Ap" || ToSet == "Apoapsis") {
+                    _apoapsis = Apo;
+                    Orbit.this.print("apoapsis");
+                }
+                else if(ToSet == "Pe" || ToSet == "Apoapsis"){
+                    _periapsis = Peri;
+                    Orbit.this.print("periapsis");
+                }
+                else if(ToSet=="both"){
+                    _apoapsis = Apo;
+                    _periapsis = Peri;
+                    Orbit.this.print("apoapsis");
+                    Orbit.this.print("periapsis");
+                
+                }   
+                _apoapsis = Apo;
+                
+                
+                if(_periapsis != 0 || _periapsis != 0){
+                    _semimajor_axis = (_apoapsis + _periapsis)/2;
+                    Orbit.this.print("semimajor");
+                }
+            }
+            long ApGet(){
+                return _apoapsis;
+            }
+            long PeGet(){
+                return _periapsis;
+            }
+        }
+        
+        /////////////////////////
+        void print(String attr){
+            if(!(_name == prev_selected)) {
+                System.out.println("\n"+_emoji+_name);}
+            prev_selected = _name;
+            switch(attr){
+                case "all":
+                    System.out.println();
+                case "semimajor":
+                    System.out.println("  ⚪ Semi-major axis: "+_semimajor_axis+" m"); //meters
+                    break;
+                case "apoapsis":
+                    System.out.println("  ⬆️ Apoapsis: "+_apoapsis+" m"); //meters
+                    break;
+                case "periapsis":
+                    System.out.println("  ⬇️ Periapsis: "+_periapsis+" m"); //meters
+                    break;
+            }
+        }
     }
 }
-    
 
 
