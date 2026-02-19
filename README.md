@@ -4,4 +4,4 @@ ___
 ***disclamer** - this is an aplha version, i'm not a profesional coder or hacker, i just want study code. If want help me you, i'll be very very happy ))*
 
 ## Functional
-At this point i have only coded some classes, like Planet class, whitch create Planet object, for example Kerbin, and you can change some properties, values etc.
+At this point i have only coded some classes, like Planet class, whitch create Planet object. For example Kerbin, and you can change some properties, values etc. 
