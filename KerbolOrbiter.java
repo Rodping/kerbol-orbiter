@@ -226,8 +226,6 @@ class Planet {
     public class Orbit{
         /////////////////////////
         public SemiMajor_Axis semimajor_axis = new SemiMajor_Axis();
-        public Apoapsis apoapsis = new Apoapsis();
-        public Periapsis periapsis = new Periapsis();
         public Ap_Pe_Apsis ap_pe_apsis = new Ap_Pe_Apsis();
         //public Orbital_Arguments orbital_args = new Orbital_Arguments();
         /////////////////////////
